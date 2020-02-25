@@ -1,4 +1,4 @@
-# Ship to Shore
+# [Ship to Shore](https://www.spglobal.com/marketintelligence/en/news-insights/research/ship-to-shore-mapping-the-global-supply-chain-with-panjiva-shipping-data-in-xpressfeed?utm_source=twitter&utm_medium=social&utm_content=&utm_campaign=QR-ShipToShore-global-invesmgmt)
 #### Mapping the Global Supply Chain with Panjiva Shipping Data in Xpressfeed
 ### As of Feb 2020; by Richard Torotiello; Temi Oyeniyi, CFA; Zack Yang; Eric Oak
 
