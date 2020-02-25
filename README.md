@@ -274,3 +274,5 @@ WHERE stg.GIC IN (20301010, 45202030) -- select GICS subindustries
 GROUP BY stg.GIC, st.subTypeValue, DATEPART(YEAR, shpmtDate), DATEPART(MONTH, shpmtDate) -- group by industry code, industry name, year & month
 ORDER BY 1, 3, 4
 ```
+---
+Copyright © 2020 by S&P Global Market Intelligence, a division of S&P Global Inc. All rights reserved.
