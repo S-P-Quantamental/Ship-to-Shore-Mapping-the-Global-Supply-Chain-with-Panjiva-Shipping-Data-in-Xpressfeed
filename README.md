@@ -39,14 +39,11 @@ SELECT c.companyID, c.companyName
   , COUNT(imp.panjivaRecordId) AS RecordCount
   , SUM(imp.volumeTEU) AS TEUCount
   , SUM(imp.weightT) AS MetricTons
-FROM xfl_ciq..ciqCompany c
-  JOIN xfl_ciq..ciqCompanyIndustry ci
+FROM xfl_ciq..ciqCompany c -- begin with all CIQ companies
+  JOIN xfl_ciq..ciqCompanyIndustry ci -- link to industry ID table
     ON ci.companyId = c.companyId
-  JOIN xfl_ciq..ciqSubTypeToGICS stg
+  JOIN xfl_ciq..ciqSubTypeToGICS stg -- link to GICs table
     ON stg.subTypeId = ci.industryId
--- begin with all CIQ companies
--- link to industry ID table
--- link to GICs table
  JOIN xfl_ciq..ciqCompanyUltimateParent cup
    ON cup.ultimateParentCompanyId = c.companyId -- link ultimate parent table
  JOIN xfl_panjiva..panjivaCompanyCrossRef ccr
@@ -73,13 +70,10 @@ SELECT conPanjivaID, panjivaRecordId, shpmtDate, volumeTEU, grossWeightT AS weig
 FROM xfl_panjiva..panjivaMXExport2017
 WHERE itemDestination = 'United States' and transportMethod != 'Maritime'
   ) AS imp ON imp.conPanjivaId = ccr.identifierValue
-WHERE stg.GIC = 25101010
-  AND c.countryID = 213
-  AND shpmtDate >  '2017-08-31'
+WHERE stg.GIC = 25101010 -- GICS auto parts/eqpmt makers only
+  AND c.countryID = 213 -- US Companies Only
+  AND shpmtDate >  '2017-08-31' -- Get two full years of data
   AND shpmtDate <= '2019-08-31'
--- GICS auto parts/eqpmt makers only
--- US Companies Only
--- Get two full years of data
 GROUP BY c.companyId, c.companyName, DATEPART(YEAR,shpmtDate),
 DATEPART(MONTH,shpmtDate)
 ORDER BY 2, 3, 4
@@ -147,19 +141,14 @@ Displays the number of shipments that contain a specific product (HS code) and p
 SELECT spl.value AS HSCode
    , hsc.hsCodeDescription AS HSCodeDescription
    , COUNT(DISTINCT imp.panjivaRecordId) AS Shipments
-FROM xfl_ciq..ciqCompany c
-JOIN xfl_ciq..ciqCompanyUltimateParent cup
+FROM xfl_ciq..ciqCompany c -- begin with all CIQ companies
+JOIN xfl_ciq..ciqCompanyUltimateParent cup -- link ultimate parent table
   ON cup.ultimateParentCompanyId = c.companyId
-JOIN xfl_panjiva..panjivaCompanyCrossRef ccr
+JOIN xfl_panjiva..panjivaCompanyCrossRef ccr -- Panjiva/CIQ cross ref table
   ON ccr.companyId = cup.companyId
-JOIN xfl_panjiva..panjivaUSImport2018 imp
+JOIN xfl_panjiva..panjivaUSImport2018 imp -- link 2018 US import table
   ON imp.conPanjivaId = ccr.identifierValue
-JOIN xfl_panjiva..panjivaUSImpHSCode2018 h
--- begin with all CIQ companies
--- link ultimate parent table
--- Panjiva/CIQ cross ref table
--- link 2018 US import table
--- link corresp. HS code table
+JOIN xfl_panjiva..panjivaUSImpHSCode2018 h -- link corresp. HS code table
 ON h.panjivaRecordId = imp.panjivaRecordId
 CROSS APPLY STRING_SPLIT(REPLACE(REPLACE(h.hscode,'.',''),' ',''),';') spl -- splits records with multiple HS codes by separator (semicolon)
               JOIN xfl_panjiva..panjivaHSClassification hsc -- provides HS code text desc
